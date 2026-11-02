@@ -14,6 +14,7 @@ import {
   Lock,
   Zap,
   Box,
+  Film,
 } from 'lucide-react';
 import { Difficulty, GameMode } from '../types/game';
 
@@ -45,6 +46,8 @@ interface GameHUDProps {
   onRestart: () => void;
   onUndo: () => void;
   onHint: () => void;
+  onWatchAdHint?: () => void;
+  onWatchAdCoins?: () => void;
   onOpenLevelSelect: () => void;
   onBackToMenu: () => void;
 }
@@ -76,6 +79,8 @@ export const GameHUD: React.FC<GameHUDProps> = ({
   onRestart,
   onUndo,
   onHint,
+  onWatchAdHint,
+  onWatchAdCoins,
   onOpenLevelSelect,
   onBackToMenu,
 }) => {
@@ -194,6 +199,18 @@ export const GameHUD: React.FC<GameHUDProps> = ({
             <span className="text-[11px] font-bold text-amber-300 tabular-nums">{coins}</span>
           </div>
 
+          {onWatchAdCoins && (
+            <button
+              type="button"
+              onClick={onWatchAdCoins}
+              title="Watch ad for +50 free coins"
+              className="flex items-center gap-1 px-1.5 py-0.5 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-[10px] font-bold active:scale-95 transition-all cursor-pointer shadow-sm"
+            >
+              <Film className="w-3 h-3 text-amber-400" />
+              <span>+50</span>
+            </button>
+          )}
+
           <button
             type="button"
             onClick={onToggleMusic}
@@ -273,25 +290,40 @@ export const GameHUD: React.FC<GameHUDProps> = ({
           <span>Undo</span>
         </button>
 
-        <button
-          type="button"
-          onClick={onHint}
-          disabled={!canHint}
-          aria-label={`Get a hint (costs ${hintCost} coins)`}
-          className={`h-9 sm:h-10 rounded-xl border flex items-center justify-center gap-1.5 text-xs font-semibold active:scale-95 transition-all shadow-sm
-            ${
-              canHint
-                ? 'bg-emerald-950/40 hover:bg-emerald-900/50 border-emerald-500/50 text-emerald-300 hover:text-emerald-200 cursor-pointer shadow-[0_0_12px_rgba(16,185,129,0.15)]'
-                : 'bg-[#12151d] border-[#1f2430] text-slate-600 cursor-not-allowed opacity-60'
-            }
-          `}
-        >
-          <Lightbulb className="w-3.5 h-3.5 text-emerald-400" />
-          <span>Hint</span>
-          <span className="text-[9px] text-amber-300 font-bold bg-black/40 px-1 py-0.2 rounded">
-            {hintCost}🪙
-          </span>
-        </button>
+        {coins >= hintCost || !onWatchAdHint ? (
+          <button
+            type="button"
+            onClick={onHint}
+            disabled={!canHint}
+            aria-label={`Get a hint (costs ${hintCost} coins)`}
+            className={`h-9 sm:h-10 rounded-xl border flex items-center justify-center gap-1.5 text-xs font-semibold active:scale-95 transition-all shadow-sm
+              ${
+                canHint
+                  ? 'bg-emerald-950/40 hover:bg-emerald-900/50 border-emerald-500/50 text-emerald-300 hover:text-emerald-200 cursor-pointer shadow-[0_0_12px_rgba(16,185,129,0.15)]'
+                  : 'bg-[#12151d] border-[#1f2430] text-slate-600 cursor-not-allowed opacity-60'
+              }
+            `}
+          >
+            <Lightbulb className="w-3.5 h-3.5 text-emerald-400" />
+            <span>Hint</span>
+            <span className="text-[9px] text-amber-300 font-bold bg-black/40 px-1 py-0.2 rounded">
+              {hintCost}🪙
+            </span>
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={onWatchAdHint}
+            aria-label="Watch video ad for a free hint"
+            className="h-9 sm:h-10 rounded-xl border flex items-center justify-center gap-1.5 text-xs font-semibold active:scale-95 transition-all shadow-sm bg-amber-950/40 hover:bg-amber-900/50 border-amber-500/50 text-amber-300 hover:text-amber-200 cursor-pointer shadow-[0_0_12px_rgba(245,158,11,0.2)] animate-pulse"
+          >
+            <Film className="w-3.5 h-3.5 text-amber-400" />
+            <span>Free Hint</span>
+            <span className="text-[9px] text-amber-300 font-bold bg-black/40 px-1 py-0.2 rounded">
+              Ad
+            </span>
+          </button>
+        )}
       </div>
     </header>
   );

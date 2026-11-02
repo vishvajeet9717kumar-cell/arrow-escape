@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Timer, Trophy, Zap, Coins, RotateCcw, Home } from 'lucide-react';
+import { Timer, Trophy, Zap, Coins, RotateCcw, Home, Film, Sparkles } from 'lucide-react';
 import { sounds } from '../utils/audio';
 
 interface RushOverModalProps {
@@ -9,6 +9,7 @@ interface RushOverModalProps {
   isNewHighScore: boolean;
   bestScore: number;
   coinsEarned: number;
+  onSecondChance?: () => void;
   onPlayAgain: () => void;
   onBackToMenu: () => void;
 }
@@ -20,6 +21,7 @@ export const RushOverModal: React.FC<RushOverModalProps> = ({
   isNewHighScore,
   bestScore,
   coinsEarned,
+  onSecondChance,
   onPlayAgain,
   onBackToMenu,
 }) => {
@@ -101,6 +103,25 @@ export const RushOverModal: React.FC<RushOverModalProps> = ({
 
         {/* Action Buttons */}
         <div className="w-full flex flex-col gap-2">
+          {onSecondChance && (
+            <button
+              type="button"
+              onClick={onSecondChance}
+              className="w-full h-11 rounded-2xl bg-gradient-to-r from-emerald-500/25 via-emerald-400/35 to-emerald-500/25 hover:from-emerald-500/40 hover:to-emerald-400/40 border border-emerald-400/60 text-emerald-300 font-extrabold text-xs sm:text-sm flex items-center justify-between px-3.5 active:scale-[0.98] transition-all shadow-lg shadow-emerald-500/20 cursor-pointer animate-pulse"
+            >
+              <div className="flex items-center gap-1.5">
+                <Film className="w-4 h-4 text-emerald-400" />
+                <span>Second Chance (+15s)</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] font-black bg-emerald-400 text-slate-950 px-2 py-0.5 rounded-md flex items-center gap-0.5">
+                  <Sparkles className="w-3 h-3" />
+                  FREE AD
+                </span>
+              </div>
+            </button>
+          )}
+
           <button
             type="button"
             onClick={onPlayAgain}

@@ -16,6 +16,21 @@ export type SpecialArrowType =
   | 'key'
   | 'rotating';
 
+export type AdType = 'rewarded' | 'interstitial' | 'banner';
+
+export type RewardReason =
+  | 'coins_50'
+  | 'free_hint'
+  | 'double_victory_coins'
+  | 'rush_second_chance';
+
+export interface AdRewardConfig {
+  reason: RewardReason;
+  title: string;
+  description: string;
+  rewardValue?: number;
+}
+
 export interface ArrowTile {
   id: string;
   row: number;

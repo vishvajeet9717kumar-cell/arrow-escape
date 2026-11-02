@@ -11,6 +11,7 @@ import {
   Coins,
   Sparkles,
   Zap,
+  Film,
 } from 'lucide-react';
 import { sounds } from '../utils/audio';
 
@@ -27,6 +28,7 @@ interface MainMenuProps {
   onOpenSettings: () => void;
   onPlay: (level?: number) => void;
   onPlayRush: () => void;
+  onWatchAdCoins?: () => void;
   onOpenLevelSelect: () => void;
   onOpenDaily: () => void;
   onOpenHowToPlay: () => void;
@@ -45,6 +47,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({
   onOpenSettings,
   onPlay,
   onPlayRush,
+  onWatchAdCoins,
   onOpenLevelSelect,
   onOpenDaily,
   onOpenHowToPlay,
@@ -111,11 +114,25 @@ export const MainMenu: React.FC<MainMenuProps> = ({
           </button>
         </div>
 
-        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#151923] border border-[#262f42]">
-          <Coins className="w-4 h-4 text-amber-400 fill-amber-400/20" />
-          <span className="text-xs font-bold text-amber-300 tabular-nums">
-            {coins}
-          </span>
+        <div className="flex items-center gap-1.5">
+          {onWatchAdCoins && (
+            <button
+              type="button"
+              onClick={onWatchAdCoins}
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500/20 to-amber-500/10 hover:from-amber-500/30 hover:to-amber-500/20 border border-amber-500/40 text-amber-300 active:scale-95 transition-all cursor-pointer shadow-sm animate-pulse"
+              title="Watch a short ad for +50 free coins"
+            >
+              <Film className="w-3.5 h-3.5 text-amber-400" />
+              <span className="text-[11px] font-black">+50 🪙</span>
+            </button>
+          )}
+
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#151923] border border-[#262f42]">
+            <Coins className="w-4 h-4 text-amber-400 fill-amber-400/20" />
+            <span className="text-xs font-bold text-amber-300 tabular-nums">
+              {coins}
+            </span>
+          </div>
         </div>
       </div>
 

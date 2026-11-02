@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Star, Coins, ArrowRight, RotateCcw, Grid } from 'lucide-react';
+import { Star, Coins, ArrowRight, RotateCcw, Grid, Film, Sparkles } from 'lucide-react';
 import { sounds } from '../utils/audio';
 
 interface VictoryModalProps {
@@ -11,6 +11,8 @@ interface VictoryModalProps {
   parMoves: number;
   hintsUsed: number;
   undoCount: number;
+  isCoinsDoubled?: boolean;
+  onDoubleCoins?: () => void;
   onNextLevel: () => void;
   onReplay: () => void;
   onLevelSelect: () => void;
@@ -25,6 +27,8 @@ export const VictoryModal: React.FC<VictoryModalProps> = ({
   parMoves,
   hintsUsed,
   undoCount,
+  isCoinsDoubled = false,
+  onDoubleCoins,
   onNextLevel,
   onReplay,
   onLevelSelect,
@@ -221,6 +225,32 @@ export const VictoryModal: React.FC<VictoryModalProps> = ({
 
         {/* Action Buttons */}
         <div className="w-full flex flex-col gap-2 z-20">
+          {!isCoinsDoubled && onDoubleCoins && coinsEarned > 0 && (
+            <button
+              type="button"
+              onClick={onDoubleCoins}
+              className="w-full h-11 rounded-2xl bg-gradient-to-r from-amber-500/20 via-amber-400/25 to-amber-500/20 hover:from-amber-500/35 hover:to-amber-400/35 border border-amber-400/60 text-amber-300 font-extrabold text-xs sm:text-sm flex items-center justify-between px-3 active:scale-[0.98] transition-all shadow-md shadow-amber-500/15 cursor-pointer animate-pulse"
+            >
+              <div className="flex items-center gap-1.5">
+                <Film className="w-4 h-4 text-amber-400" />
+                <span>Double Level Coins</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[11px] font-bold text-amber-200">+{coinsEarned}🪙</span>
+                <span className="px-1.5 py-0.5 rounded-md bg-amber-400 text-slate-950 font-black text-[10px]">
+                  2X AD
+                </span>
+              </div>
+            </button>
+          )}
+
+          {isCoinsDoubled && (
+            <div className="w-full py-1 px-3 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold flex items-center justify-center gap-1.5 animate-[fadeIn_0.3s_ease-out]">
+              <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Coins Doubled! (+{coinsEarned} 🪙)</span>
+            </div>
+          )}
+
           <button
             type="button"
             onClick={onNextLevel}

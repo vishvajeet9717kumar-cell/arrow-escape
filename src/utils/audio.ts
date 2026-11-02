@@ -977,6 +977,62 @@ class SoundSystem {
       // Audio fallback
     }
   }
+
+  /** Celebratory jingle when an ad is completed and reward is granted */
+  public playAdReward() {
+    if (this.isSoundMuted) return;
+    this.initContext();
+    if (!this.ctx || !this.sfxGainNode) return;
+
+    this.triggerHaptic('medium');
+
+    try {
+      const now = this.ctx.currentTime;
+      const notes = [523.25, 659.25, 783.99, 1046.5]; // C5, E5, G5, C6
+      notes.forEach((freq, idx) => {
+        const osc = this.ctx!.createOscillator();
+        const gain = this.ctx!.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+
+        gain.gain.setValueAtTime(0, now + idx * 0.08);
+        gain.gain.linearRampToValueAtTime(0.22, now + idx * 0.08 + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.35);
+
+        osc.connect(gain);
+        gain.connect(this.sfxGainNode!);
+        osc.start(now + idx * 0.08);
+        osc.stop(now + idx * 0.08 + 0.38);
+      });
+    } catch {
+      // Audio fallback
+    }
+  }
+
+  /** Subtle tick for ad countdown */
+  public playAdTick() {
+    if (this.isSoundMuted) return;
+    this.initContext();
+    if (!this.ctx || !this.sfxGainNode) return;
+
+    try {
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(800, now);
+
+      gain.gain.setValueAtTime(0.04, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
+
+      osc.connect(gain);
+      gain.connect(this.sfxGainNode);
+      osc.start(now);
+      osc.stop(now + 0.04);
+    } catch {
+      // Audio fallback
+    }
+  }
 }
 
 export const sounds = new SoundSystem();

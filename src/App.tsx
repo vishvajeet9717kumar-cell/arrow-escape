@@ -12,6 +12,8 @@ import {
   GameMode,
   RushStats,
   CubeFace,
+  AdType,
+  RewardReason,
 } from './types/game';
 import {
   generateLevel,
@@ -30,6 +32,7 @@ import {
   getTodayDateString,
 } from './utils/storage';
 import { sounds } from './utils/audio';
+import { adManager } from './utils/adManager';
 import { GameBoard } from './components/GameBoard';
 import { CubeBoard } from './components/CubeBoard';
 import { GameHUD } from './components/GameHUD';
@@ -41,6 +44,8 @@ import { HowToPlayModal } from './components/HowToPlayModal';
 import { SettingsModal } from './components/SettingsModal';
 import { TutorialModal, TutorialType } from './components/TutorialModal';
 import { MainMenu } from './components/MainMenu';
+import { AdModal } from './components/AdModal';
+import { BannerAd } from './components/BannerAd';
 import { RotateCcw, AlertTriangle } from 'lucide-react';
 
 const HINT_COST = 15;
@@ -61,6 +66,14 @@ export default function App() {
   const [showRushOverModal, setShowRushOverModal] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [activeTutorial, setActiveTutorial] = useState<TutorialType | null>(null);
+
+  // Ad Modal state & victory doubled status
+  const [activeAd, setActiveAd] = useState<{
+    type: AdType;
+    reason?: RewardReason;
+    onComplete?: () => void;
+  } | null>(null);
+  const [isVictoryCoinsDoubled, setIsVictoryCoinsDoubled] = useState<boolean>(false);
 
   // Active level data and board state
   const [currentLevelData, setCurrentLevelData] = useState<LevelData>(() =>
@@ -137,6 +150,7 @@ export default function App() {
     setBlockedCoord(null);
     setHintedArrowId(null);
     setShowVictoryModal(false);
+    setIsVictoryCoinsDoubled(false);
     setMoveLimitFailed(false);
     isBusyRef.current = false;
     victoryProcessedRef.current = false;
@@ -639,6 +653,7 @@ export default function App() {
     setBlockedCoord(null);
     setHintedArrowId(null);
     setShowVictoryModal(false);
+    setIsVictoryCoinsDoubled(false);
     setMoveLimitFailed(false);
     isBusyRef.current = false;
     victoryProcessedRef.current = false;
@@ -700,10 +715,82 @@ export default function App() {
     setShowDailyModal(false);
   };
 
-  // Next level navigation from victory modal (up to 500)
+  // Ad Handlers (Rewarded & Interstitial)
+  const handleWatchAdCoins = () => {
+    sounds.resumeAudio();
+    setActiveAd({
+      type: 'rewarded',
+      reason: 'coins_50',
+      onComplete: () => {
+        const nextCoins = profile.coins + 50;
+        saveProgress({ coins: nextCoins });
+        setProfile((p) => ({ ...p, coins: nextCoins }));
+        sounds.playCoin();
+      },
+    });
+  };
+
+  const handleWatchAdHint = () => {
+    sounds.resumeAudio();
+    setActiveAd({
+      type: 'rewarded',
+      reason: 'free_hint',
+      onComplete: () => {
+        const clearArrows = getClearArrows(activeArrows, currentLevelData.gridSize);
+        if (clearArrows.length > 0) {
+          setHintedArrowId(clearArrows[0].id);
+          setHintsUsed((h) => h + 1);
+          sounds.playHint();
+        }
+      },
+    });
+  };
+
+  const handleDoubleVictoryCoins = () => {
+    if (isVictoryCoinsDoubled) return;
+    sounds.resumeAudio();
+    setActiveAd({
+      type: 'rewarded',
+      reason: 'double_victory_coins',
+      onComplete: () => {
+        const bonus = victoryStats.coinsEarned;
+        const nextCoins = profile.coins + bonus;
+        saveProgress({ coins: nextCoins });
+        setProfile((p) => ({ ...p, coins: nextCoins }));
+        setIsVictoryCoinsDoubled(true);
+        sounds.playCoin();
+      },
+    });
+  };
+
+  const handleRushSecondChance = () => {
+    sounds.resumeAudio();
+    setActiveAd({
+      type: 'rewarded',
+      reason: 'rush_second_chance',
+      onComplete: () => {
+        setShowRushOverModal(false);
+        setRushTimeLeft(15);
+        sounds.playStar(2);
+      },
+    });
+  };
+
+  // Next level navigation from victory modal with Interstitial Ad check
   const handleNextLevel = () => {
     const nextLvl = Math.min(500, currentLevelData.levelNumber + 1);
-    handleStartClassicLevel(nextLvl);
+    const shouldShowInterstitial = adManager.onLevelCompleted(currentLevelData.levelNumber);
+
+    if (shouldShowInterstitial) {
+      setActiveAd({
+        type: 'interstitial',
+        onComplete: () => {
+          handleStartClassicLevel(nextLvl);
+        },
+      });
+    } else {
+      handleStartClassicLevel(nextLvl);
+    }
   };
 
   const isDailyAvailable = isDailyRewardAvailable(profile.lastClaimDate);
@@ -724,6 +811,7 @@ export default function App() {
           onOpenSettings={() => setShowSettings(true)}
           onPlay={(lvl) => handleStartClassicLevel(lvl ?? profile.currentLevel)}
           onPlayRush={handleStartRush}
+          onWatchAdCoins={handleWatchAdCoins}
           onOpenLevelSelect={() => setShowLevelSelect(true)}
           onOpenDaily={() => setShowDailyModal(true)}
           onOpenHowToPlay={() => setShowHowToPlay(true)}
@@ -759,6 +847,8 @@ export default function App() {
             onRestart={handleRestart}
             onUndo={handleUndo}
             onHint={handleHint}
+            onWatchAdHint={handleWatchAdHint}
+            onWatchAdCoins={handleWatchAdCoins}
             onOpenLevelSelect={() => setShowLevelSelect(true)}
             onBackToMenu={() => setView('MENU')}
           />
@@ -853,6 +943,9 @@ export default function App() {
               <span>Tap arrows that have a clear path to escape the grid</span>
             )}
           </footer>
+
+          {/* Non-intrusive Sponsor Banner Ad */}
+          <BannerAd />
         </div>
       )}
 
@@ -919,6 +1012,8 @@ export default function App() {
           parMoves={currentLevelData.parMoves}
           hintsUsed={hintsUsed}
           undoCount={undoHistory.length}
+          isCoinsDoubled={isVictoryCoinsDoubled}
+          onDoubleCoins={handleDoubleVictoryCoins}
           onNextLevel={handleNextLevel}
           onReplay={handleRestart}
           onLevelSelect={() => {
@@ -937,10 +1032,30 @@ export default function App() {
           isNewHighScore={rushStats.isNewHighScore}
           bestScore={profile.bestRushScore}
           coinsEarned={rushStats.coinsEarned}
+          onSecondChance={handleRushSecondChance}
           onPlayAgain={handleStartRush}
           onBackToMenu={() => {
             setShowRushOverModal(false);
             setView('MENU');
+          }}
+        />
+      )}
+
+      {/* Interactive Video Ad Player Modal (Rewarded & Interstitial) */}
+      {activeAd && (
+        <AdModal
+          type={activeAd.type}
+          rewardReason={activeAd.reason}
+          onReward={(_reason) => {
+            activeAd.onComplete?.();
+          }}
+          onClose={() => {
+            const onComp = activeAd.onComplete;
+            const isInterstitial = activeAd.type === 'interstitial';
+            setActiveAd(null);
+            if (isInterstitial && onComp) {
+              onComp();
+            }
           }}
         />
       )}
