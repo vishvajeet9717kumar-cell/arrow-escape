@@ -12,8 +12,11 @@ import {
   Sparkles,
   Zap,
   Film,
+  Smartphone,
+  Download,
 } from 'lucide-react';
 import { sounds } from '../utils/audio';
+import { usePWAInstall } from '../hooks/usePWAInstall';
 
 interface MainMenuProps {
   currentLevel: number;
@@ -32,6 +35,7 @@ interface MainMenuProps {
   onOpenLevelSelect: () => void;
   onOpenDaily: () => void;
   onOpenHowToPlay: () => void;
+  onOpenPublishHub: () => void;
 }
 
 export const MainMenu: React.FC<MainMenuProps> = ({
@@ -51,7 +55,9 @@ export const MainMenu: React.FC<MainMenuProps> = ({
   onOpenLevelSelect,
   onOpenDaily,
   onOpenHowToPlay,
+  onOpenPublishHub,
 }) => {
+  const { isInstallable, install } = usePWAInstall();
   // Mini interactive toy on title screen: 4 playful arrows that fly away when clicked!
   const [toyArrows, setToyArrows] = useState<
     { id: string; dir: 'UP' | 'DOWN' | 'LEFT' | 'RIGHT'; label: string; active: boolean }[]
@@ -233,6 +239,25 @@ export const MainMenu: React.FC<MainMenuProps> = ({
           <div className="text-[10px] sm:text-[11px] font-bold text-amber-300 bg-amber-950/70 border border-amber-500/40 px-2 py-0.5 rounded-full">
             {bestRushScore > 0 ? `Best: ${bestRushScore.toLocaleString()} pts` : 'Rapid Challenge'}
           </div>
+        </button>
+
+        {/* Mobile Install & Play Store Hub Button */}
+        <button
+          type="button"
+          onClick={isInstallable ? install : onOpenPublishHub}
+          className="w-full h-10 sm:h-11 rounded-2xl bg-gradient-to-r from-cyan-500/20 via-emerald-500/15 to-cyan-500/20 hover:from-cyan-500/30 hover:to-emerald-500/25 border border-cyan-500/40 hover:border-cyan-400 text-cyan-300 font-extrabold text-xs sm:text-sm flex items-center justify-between px-3.5 sm:px-4 active:scale-[0.98] transition-all shadow-md shadow-cyan-500/10 cursor-pointer group"
+        >
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 rounded-lg bg-cyan-400/20 flex items-center justify-center text-cyan-300 group-hover:scale-110 transition-transform">
+              <Smartphone className="w-3.5 h-3.5" />
+            </div>
+            <span className="tracking-wide">
+              {isInstallable ? '📱 INSTALL TO PHONE' : '📱 MOBILE APP & PLAY STORE'}
+            </span>
+          </div>
+          <span className="text-[10px] sm:text-[11px] font-bold text-emerald-300 bg-emerald-950/70 border border-emerald-500/40 px-2 py-0.5 rounded-full">
+            {isInstallable ? '1-Click Free' : 'Guides & APK'}
+          </span>
         </button>
 
         {/* Secondary Buttons Grid */}

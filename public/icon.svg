@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#090d16" />
+      <stop offset="100%" stop-color="#020408" />
+    </linearGradient>
+    <linearGradient id="neonCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#22d3ee" />
+      <stop offset="100%" stop-color="#06b6d4" />
+    </linearGradient>
+    <linearGradient id="neonPurple" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#c084fc" />
+      <stop offset="100%" stop-color="#9333ea" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="10" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+  <rect width="512" height="512" rx="128" fill="url(#bg)" stroke="#1e293b" stroke-width="8" />
+  <!-- Center cube silhouette -->
+  <rect x="176" y="176" width="160" height="160" rx="24" fill="#0f172a" stroke="#334155" stroke-width="6" />
+  <!-- Radiating Arrows -->
+  <!-- Top Arrow -->
+  <g filter="url(#glow)">
+    <path d="M256 160 V70" stroke="url(#neonCyan)" stroke-width="18" stroke-linecap="round" />
+    <path d="M226 100 L256 60 L286 100" fill="none" stroke="url(#neonCyan)" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+  <!-- Right Arrow -->
+  <g filter="url(#glow)">
+    <path d="M352 256 H442" stroke="url(#neonPurple)" stroke-width="18" stroke-linecap="round" />
+    <path d="M412 226 L452 256 L412 286" fill="none" stroke="url(#neonPurple)" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+  <!-- Bottom Arrow -->
+  <g filter="url(#glow)">
+    <path d="M256 352 V442" stroke="url(#neonCyan)" stroke-width="18" stroke-linecap="round" />
+    <path d="M226 412 L256 452 L286 412" fill="none" stroke="url(#neonCyan)" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+  <!-- Left Arrow -->
+  <g filter="url(#glow)">
+    <path d="M160 256 H70" stroke="url(#neonPurple)" stroke-width="18" stroke-linecap="round" />
+    <path d="M100 226 L60 256 L100 286" fill="none" stroke="url(#neonPurple)" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+  <!-- Inner Arrow in Center Cube -->
+  <circle cx="256" cy="256" r="28" fill="#38bdf8" opacity="0.9" filter="url(#glow)" />
+</svg>

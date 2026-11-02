@@ -46,6 +46,7 @@ import { TutorialModal, TutorialType } from './components/TutorialModal';
 import { MainMenu } from './components/MainMenu';
 import { AdModal } from './components/AdModal';
 import { BannerAd } from './components/BannerAd';
+import { MobilePublishModal } from './components/MobilePublishModal';
 import { RotateCcw, AlertTriangle } from 'lucide-react';
 
 const HINT_COST = 15;
@@ -65,6 +66,7 @@ export default function App() {
   const [showVictoryModal, setShowVictoryModal] = useState(false);
   const [showRushOverModal, setShowRushOverModal] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showPublishHub, setShowPublishHub] = useState(false);
   const [activeTutorial, setActiveTutorial] = useState<TutorialType | null>(null);
 
   // Ad Modal state & victory doubled status
@@ -815,6 +817,7 @@ export default function App() {
           onOpenLevelSelect={() => setShowLevelSelect(true)}
           onOpenDaily={() => setShowDailyModal(true)}
           onOpenHowToPlay={() => setShowHowToPlay(true)}
+          onOpenPublishHub={() => setShowPublishHub(true)}
         />
       ) : (
         <div className="w-full max-w-md h-[100dvh] max-h-[100dvh] flex flex-col justify-between items-center py-1 sm:py-2 px-3 select-none relative overflow-hidden">
@@ -994,6 +997,11 @@ export default function App() {
           onToggleReducedMotion={handleToggleReducedMotion}
           onClose={() => setShowSettings(false)}
         />
+      )}
+
+      {/* Mobile Publish & Direct Install Hub */}
+      {showPublishHub && (
+        <MobilePublishModal onClose={() => setShowPublishHub(false)} />
       )}
 
       {/* Interactive Tutorial Modal for 3D Cube & Special Arrows */}
