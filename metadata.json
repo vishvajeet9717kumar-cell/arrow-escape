@@ -1,0 +1,6 @@
+{
+  "name": "Arrow Escape",
+  "description": "A minimalist mobile-first puzzle game where players clear directional arrows with unobstructed escape routes.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
